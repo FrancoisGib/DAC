@@ -1,0 +1,22 @@
+---
+- name: Update web servers
+  remote_user: ubuntu
+  become: yes
+  hosts: myhosts
+  tasks:
+    - name: Update
+      apt:
+        update_cache: yes
+
+    - name: upgrade
+      apt:
+        upgrade: dist
+
+    - name: Ansible apt-get to get install nginx
+      apt:
+        name: nginx
+        state: present
+        force_apt_get: yes
+
+    - name: configure
+      script: script.sh
