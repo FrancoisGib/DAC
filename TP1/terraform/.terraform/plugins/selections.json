@@ -1,0 +1,10 @@
+{
+  "registry.terraform.io/jeremmfr/iptables": {
+    "hash": "h1:4tRjsofdEa9kSNyRjYNByZBEUG4spAM4WVUcLEIA2nw=",
+    "version": "1.2.1"
+  },
+  "registry.terraform.io/terraform-provider-openstack/openstack": {
+    "hash": "h1:YLGvYkSuagyP5orUTyKNK+JhzS17EFTUDpZ5R5/fFv4=",
+    "version": "1.53.0"
+  }
+}

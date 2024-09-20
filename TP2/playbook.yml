@@ -1,0 +1,116 @@
+---
+- name: Update web servers
+  remote_user: ubuntu
+  become: true
+  hosts: myhosts
+  tasks:
+    - name: Ping hosts
+      ping:
+
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Copy file
+      copy:
+        src: ./index.html
+        dest: /home/ubuntu/nginx/
+
+    - name: Create nginx container
+      docker_container:
+        name: nginx
+        image: nginx
+        ports:
+          - "80:80"
+        volumes:
+          - /home/ubuntu/nginx:/var/www/html
+
+    - name: Allow input on port https (443)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: https
+        jump: ACCEPT
+
+    - name: Allow input on port http (80)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: http
+        jump: ACCEPT
+
+    - name: Allow ssh access from established or related requests
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        ctstate:
+          - ESTABLISHED
+          - RELATED
+        destination_port: ssh
+        jump: ACCEPT
+
+    - name: Allow output on port https (443)
+      iptables:
+        chain: OUTPUT
+        protocol: tcp
+        source_port: https
+        jump: ACCEPT
+
+    - name: Allow output on port http (80)
+      iptables:
+        chain: OUTPUT
+        protocol: tcp
+        source_port: http
+        jump: ACCEPT
+
+    - name: Allow ssh output
+      iptables:
+        chain: OUTPUT
+        protocol: tcp
+        source_port: ssh
+        jump: ACCEPT
+
+    - name: Deny all output access
+      iptables:
+        chain: OUTPUT
+        policy: DROP
+
+    - name: Deny all input access
+      iptables:
+        chain: INPUT
+        policy: DROP

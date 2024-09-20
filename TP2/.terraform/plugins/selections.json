@@ -1,0 +1,6 @@
+{
+  "registry.terraform.io/terraform-provider-openstack/openstack": {
+    "hash": "h1:YLGvYkSuagyP5orUTyKNK+JhzS17EFTUDpZ5R5/fFv4=",
+    "version": "1.53.0"
+  }
+}
