@@ -1,3 +1,4 @@
 **/.template/
 **/terraform.tfstate
 **/terraform.tfstate.backup
+**/key_pair.tf
