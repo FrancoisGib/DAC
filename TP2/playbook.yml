@@ -56,9 +56,9 @@
         name: nginx
         image: nginx
         ports:
-          - "80:80"
+          - 80:80
         volumes:
-          - /home/ubuntu/nginx:/var/www/html
+          - /home/ubuntu/nginx:/usr/share/nginx/html
 
     - name: Allow input on port https (443)
       iptables:
@@ -74,43 +74,56 @@
         destination_port: http
         jump: ACCEPT
 
-    - name: Allow ssh access from established or related requests
+    - name: Allow input on ssh port (22)
       iptables:
         chain: INPUT
         protocol: tcp
-        ctstate:
-          - ESTABLISHED
-          - RELATED
         destination_port: ssh
         jump: ACCEPT
 
-    - name: Allow output on port https (443)
+    - name: Allow output on ssh port (22)
+      iptables:
+        chain: OUTPUT
+        protocol: tcp
+        ctstate:
+          - ESTABLISHED
+        source_port: ssh
+        jump: ACCEPT
+
+    - name: Allow input on https port (443)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: https
+        jump: ACCEPT
+    
+    - name: Allow output on https port (443)
       iptables:
         chain: OUTPUT
         protocol: tcp
         source_port: https
         jump: ACCEPT
 
-    - name: Allow output on port http (80)
+    - name: Allow input on http port (80)
+      iptables:
+        chain: INPUT
+        protocol: tcp
+        destination_port: http
+        jump: ACCEPT
+
+    - name: Allow output on http port (80)
       iptables:
         chain: OUTPUT
         protocol: tcp
         source_port: http
         jump: ACCEPT
 
-    - name: Allow ssh output
-      iptables:
-        chain: OUTPUT
-        protocol: tcp
-        source_port: ssh
-        jump: ACCEPT
-
-    - name: Deny all output access
+    - name: Set the policy for the OUTPUT chain to DROP
       iptables:
         chain: OUTPUT
         policy: DROP
 
-    - name: Deny all input access
+    - name: Set the policy for the INPUT chain to DROP
       iptables:
         chain: INPUT
         policy: DROP
