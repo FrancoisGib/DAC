@@ -16,7 +16,7 @@ resource openstack_compute_instance_v2 "ubuntu" {
   flavor_name = "normale"
   key_pair    = "user_key"
   security_groups = ["default"]
-  count = 3
+  count = 3 
 
   metadata = {
     app = "ubuntu"

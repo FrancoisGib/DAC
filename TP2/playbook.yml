@@ -60,6 +60,18 @@
         volumes:
           - /home/ubuntu/nginx:/usr/share/nginx/html
 
+    - name: Allow loopback input 
+      iptables:
+        chain: INPUT
+        in_interface: lo
+        jump: ACCEPT 
+
+    - name: Allow loopback output
+      iptables:
+        chain: OUTPUT
+        out_interface: lo
+        jump: ACCEPT
+    
     - name: Allow input on port https (443)
       iptables:
         chain: INPUT
