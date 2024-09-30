@@ -1,6 +1,6 @@
 # DAC TP3
 
-### 01
+### 01)
 
 On peut override le path et faire en sorte que ce ne soit pas echo qui soit exécuter mais un autre fichier.
 
@@ -21,7 +21,7 @@ Pour fixer la faille, il faudrait plutot exécuter cette ligne.
 
 Pour récupérer le flag, on créé un fichier echo dans /tmp par exemple avec comme contenu `getflag`, on le rend exécutable avec `chmod +x /tmp/echo`, on remplace le PATH par /tmp:$PATH et on peut récupérer le flag en lançant le fichier ./flag01
 
-### 02
+### 02)
 
 On peut changer la variable d'environnement USER en une commande bash et donc exécuter n'importe quel fichier.
 
@@ -40,11 +40,11 @@ USER='$(getflag)' ./flag02
 
 Et on peut remplacer getflag par n'importe quelle commande.
 
-### 03
+### 03)
 
 Le fichier writable.sh est un script qui exécute les fichiers présents dans le répertoire writable.d puis les supprime, et ce toute les 5 minutes.
 
-### 04
+### 04)
 
 Ici, le problème est qu'on a pas les permissions de lire le fichier token.
 Par contre, grâce au programme flag04, on a les permissions d'utilier le suid (SUID: Set User ID), qui est ici flag04, ce qui veut dire que, quand on éxécute le programme, on l'éxécute avec l'utilisateur **flag04**.
@@ -65,7 +65,7 @@ ln -s /home/flag04/token /tmp/file.txt
 
 On récupère ensuite le token et on peut se login avec l'utilisateur flag04 et récupérer le drapeau.
 
-### 05
+### 05)
 
 On doit trouver des répertoires vulnerables et essayer de trouver des informations sensibles.
 La plupart des fichiers et dossiers sont inaccessibles mais on remarque que le dossier **.backup** possède un sticky bit d'éxécution (x), ce qui veut dire qu'on peut utiliser un éxécutable pour récupérer les données du répertoire.
@@ -77,10 +77,43 @@ cp ./.backup/backup-19072011.tgz ../level05/
 
 On peut ensuite décompresser l'archive et on récupère la clé ssh privée de l'utilisateur. Et on peut se connecter en ssh et récupérer le flag.
 
-### 06
+### 06)
 
 On nous dit que les credentials de l'utilisateur viennent d'un os legacy unix (legacy = système dépassé mais encore utilisé).
 Les mots de passes sont alors stockés avec un hash dans le fichier /etc/passwd, on récupère donc le hash de l'utilisateur flag06, ce qui donne :
 *flag06:ueqwOCnSGdsuM:993:993::/home/flag06:/bin/sh*. On peut ensuite le cracker avec un outil de crackage de mot de passe, ici j'utilise John the reaper.
 On fait donc `john password` et on récupère le mot de passe "*hello*".
 On peut donc maintenant se connecter en ssh à l'utilisateur flag06 avec son mot de passe et on récupère le flag.
+
+### 07)
+
+On peut voir dans le fichier *thttpd.conf* qu'il y a un serveur http *thttpd* qui tourne sur le port 7007 et qui sert les fichiers du répertoire */home/flag07*.
+
+On peut également voir qu'on a un programme **index.cgi.cgi** (CGI (Common Gateway Interface) définit une méthode d'interaction entre un serveur web et des programmes générateurs de contenu externes). Ce programme effectue un ping sur un host spécifié, cependant, il n'y a aucune vérification de l'hôte entré par l'utilisateur, on peut donc y injecter du code.
+On utilise donc le serveur pour éxécuter le programme à notre place en tant qu'utilisateur *flag07*.
+On peut éxécuter une commande sur le serveur en faisant une commande comme :
+```bash
+wget localhost:7007/index.cgi?Host=%3B'echo "ok"'
+```
+Le *%3B* étant **;** encodé en url, ce qui fait que le ping est fait dans le vide et la commande est éxécutée après.
+
+On peut donc récupérer le flag en faisant :
+```bash
+wget localhost:7007/index.cgi?Host=%3Bgetflag
+```
+et on obtient : `<html><head><title>Ping results</title></head><body><pre>You have successfully executed getflag on a target account
+</pre></body></html>`
+
+
+### 08)
+
+On observe une capture tcpdump *capture.pcap*, pour mieux la visualiser, on peut l'exporter sur la machine hôte pour l'utiliser sur wireshark.
+On peut soit créer un serveur http avec python `python -m SimpleHTTPServer`, soit utiliser netcat `cat capture.pcap | nc -l -p 8000`.
+
+Après avoir récupéré le fichier, on l'ouvre dans wireshark, et si on l'affiche en ascii, on peut voir **backdoor...00Rm8.ate**.
+On affiche les paquets sous forme héxadécimale et on a ceci :
+
+![tcpdump](./screenshots/wireshark_tcpdump.png)
+
+On peut voir que les points dans les mots à la verticale ont pour valeur 0x7F, ce qui en ascii vaut 127, soit le caractère d'effacement. Ce qui donne **backd00Rmate**, qui est le mot de passe de l'utilisateur flag08.
+
