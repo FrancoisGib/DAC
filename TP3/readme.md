@@ -119,7 +119,18 @@ On peut voir que les points dans les mots à la verticale ont pour valeur 0x7F, 
 
 ### 10)
 
-touch /tmp/token
-ln -s /tmp/token ~/token
-ln -s /tmp/token ~/token
-$(sleep 0.0001;ln -fs /home/flag10/token ~/token) | ./flag10 ~/token 127.0.0.1 -DHITHERE
+Le programme **flag10** est éxécuté avec le flag SUID (le programme est éxécuté avec l'utilisateur flag10). Cependant, la fonction access de la librairie unistd vérifie les permissions d'accès pour l'utilisateur réel et non le UID override par le programme. (cf access doc: using the real user ID in place of the effective user ID and the real group ID in place of the effective group ID). La fonction open ne vérifiant pas les permissions de l'utilisateur, on peut essayer d'outrepasser la fonction access.
+
+On peut donc utiliser un lien symbolique, qui, au début de l'éxécution du programme pointerait vers un fichier auquel on a accès et qui ensuite (après la fonction access), pointerait vers le vrai token dans */home/flag10*.
+Soit on met un délai, soit on fait une boucle infinie qui va changer continuellement le lien symbolique. J'ai opté pour la deuxième version. Et on a juste à lancer le programme avec le fichier */tmp/link* et l'adresse 127.0.0.1 (localhost) puis récupérer le token avec un serveur netcat par exemple. 
+
+```bash
+touch /tmp/link
+nc -lk 18211
+while true; do ln -sf /home/flag10/token /tmp/link; ln -sf /tmp/fake_token /tmp/link; done
+while true; do /home/flag10/flag10 /tmp/link 127.0.0.1; done
+```
+
+![Level10](./screenshots/level10.png)
+
+Et on récupère le token *615a2ce1-b2b5-4c76-8eed-8aa5c4015c27*. On se connecte en ssh à l'utilisateur flag10 et on récupère le flag.
