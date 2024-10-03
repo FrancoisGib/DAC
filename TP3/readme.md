@@ -81,7 +81,7 @@ On peut ensuite décompresser l'archive et on récupère la clé ssh privée de 
 
 On nous dit que les credentials de l'utilisateur viennent d'un os legacy unix (legacy = système dépassé mais encore utilisé).
 Les mots de passes sont alors stockés avec un hash dans le fichier /etc/passwd, on récupère donc le hash de l'utilisateur flag06, ce qui donne :
-*flag06:ueqwOCnSGdsuM:993:993::/home/flag06:/bin/sh*. On peut ensuite le cracker avec un outil de crackage de mot de passe, ici j'utilise John the reaper.
+*flag06:ueqwOCnSGdsuM:993:993::/home/flag06:/bin/sh*. On peut ensuite le cracker avec un outil de crackage de mot de passe, ici j'utilise John the ripper.
 On fait donc `john password` et on récupère le mot de passe "*hello*".
 On peut donc maintenant se connecter en ssh à l'utilisateur flag06 avec son mot de passe et on récupère le flag.
 
