@@ -1,0 +1,11 @@
+- name: Master configuration
+  remote_user: ubuntu
+  become: true
+  hosts: master
+  tasks:
+    - name: Create replication user
+      postgresql_user:
+        name: replication
+        password: replication
+        role_attr_flags: LOGIN:CONNECTION
+      become_user: postgres

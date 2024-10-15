@@ -1,13 +1,21 @@
-if [ -z $1 ]
-then
-    echo "Please provide a file name"
-    exit 0
-fi
+#ansible-playbook $1 -i inventory.ini
 
-cat template_inventory.ini > temp.ini
-ips=$(terraform output | grep -E "[1-9]+" | sed 's/"//g' | sed 's/,/\\n/g' | sed 's/ //g')
-sed -i "s/instances_ip/$(echo $ips | sed "s/ //g")/g" temp.ini
-cat temp.ini > inventory.ini
-rm temp.ini
+ips=$(terraform output | grep -E "[1-9]+" | sed 's/"//g' | sed 's/ //g')
+ips_array=($(echo $ips | tr ',' "\n"))
+#echo $ips
+#echo ${ips_array[@]}
+
+master=${ips_array[0]}
+slaves=("${ips_array[@]:1}")
+
+echo "Master : $master"
+echo "Slaves : ${slaves[@]}"
+
+cat template_inventory.ini > inventory.ini
+sed -i "s/master_ip/$(echo $master | sed "s/ //g")/g" inventory.ini
+
+sed -i "s/slaves_ip/$(echo ${slaves[@]} | sed 's/ /\\n/g')/g" inventory.ini
+
 export ANSIBLE_HOST_KEY_CHECKING=False
-ansible-playbook $1 -i inventory.ini
+
+ansible-playbook playbook.yml -i inventory.ini

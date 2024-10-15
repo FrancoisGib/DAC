@@ -1,31 +1,59 @@
----
-- name: Update web servers
+- name: Master slaves common configuration
   remote_user: ubuntu
   become: true
-  hosts: myhosts
+  hosts: master:slaves
   tasks:
     - name: Ping hosts
       ping:
 
-    - name: Update apt and install postgresql
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+          - postgresql-common
+        state: latest
+        update_cache: true
+
+    - name: Add pgdg repo to sources.list.d
+      lineinfile:
+        path: /etc/apt/sources.list.d/pgdg.list
+        line: "deb http://apt.postgresql.org/pub/repos/apt jammy-pgdg main"
+        create: true
+
+    - name: Download PostgreSQL key and add it to system keyring
+      apt_key:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        state: present
+        
+    - name: Install acl
+      apt:
+        name: acl
+        state: present
+        update_cache: true
+
+    - name: Install postgresql
       apt:
         name: postgresql
         state: latest
         update_cache: true
 
-    - name: Set wal_level to hot_standby (permit readonly on slaves)
-      community.postgresql.postgresql_set:
-        name: wal_level
-        value: hot_standby
+    - name: Install Postgres Module for Python
+      pip:
+        name: postgres
 
-    - name: Set hot_standby (allow readonly requests)
-      community.postgresql.postgresql_set:
-        name: hot_standby
-        value: on
-
-    - name: Set max_wal_senders to number of replicates (2)
-      community.postgresql.postgresql_set:
-        name: max_wal_senders
-        value: 2
-
-    
+    - name: Copy PostgreSQL configuration file
+      template:
+        src: postgres.conf
+        dest: /etc/postgresql/17/main/postgresql.conf
