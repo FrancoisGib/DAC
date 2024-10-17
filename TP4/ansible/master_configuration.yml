@@ -1,0 +1,29 @@
+- name: Master configuration
+  remote_user: ubuntu
+  become: true
+  hosts: master
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Create test_table
+      postgresql_table:
+        name: test_table
+        columns:
+        - id bigserial primary key
+        - name varchar(20)
+        owner: postgres
+      become: yes
+      become_user: postgres
+
+    - name: Grant user replication from network 172.28.0.0/16 access for replication
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/17/main/pg_hba.conf"
+        contype: host
+        users: replication
+        source: 172.28.0.0/16
+        method: md5
+        databases: postgres # replication
+      notify: restart postgres

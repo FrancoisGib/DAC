@@ -1,0 +1,63 @@
+- name: Master slaves common configuration
+  remote_user: ubuntu
+  become: true
+  hosts: proxy:master:slaves
+  
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Ping hosts
+      ping:
+
+    - name: Add pgdg repo to sources.list.d 
+      lineinfile: 
+        path: /etc/apt/sources.list.d/pgdg.list
+        line: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+        create: true
+
+    - name: Download PostgreSQL key and add it to system keyring
+      apt_key:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        state: present
+
+    - name: Update apt cache and install postgresql
+      apt:
+        update_cache: true
+
+    - name: Update apt cache and install postgresql
+      apt:
+        name: ['postgresql','acl']
+        state: present
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - python3-pip
+        state: latest
+        update_cache: true
+
+    - name: Copy PostgreSQL configuration file
+      template:
+        src: ../templates/postgres_template.conf
+        dest: /etc/postgresql/17/main/postgresql.conf
+
+    - name: Replace listen adresses in postgresql_conf
+      replace:
+        path: /etc/postgresql/17/main/postgresql.conf
+        regexp: '{ instance_ip }'
+        replace: "{{ ansible_ssh_host }}"
+      notify: restart postgres
+
+    - name: Install psycopg2 python package
+      pip:
+        name: psycopg2-binary
+
+    - name: Create replication user
+      postgresql_user:
+        name: replication
+        password: replication
+        role_attr_flags: REPLICATION,LOGIN
+      become: yes
+      become_user: postgres

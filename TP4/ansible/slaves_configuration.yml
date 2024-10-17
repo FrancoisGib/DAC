@@ -1,0 +1,34 @@
+- name: Slaves configuration
+  remote_user: ubuntu
+  become: true
+  hosts: slaves
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Grant user replication from network 192.168.0.100/24 access for replication with client cert authentication
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/17/main/pg_hba.conf"
+        contype: host
+        users: replication
+        source: 172.28.0.0/16 # the subnet of the cloud
+        method: md5
+        databases: postgres # replication
+      become: yes
+      become_user: postgres
+    
+    - name: Recursively remove directory
+      file:
+        path: /var/lib/postgresql/17/main/
+        state: absent
+
+    - name: execute base backup
+      shell: export PGPASSWORD="replication" && /usr/bin/pg_basebackup -h {{ master_ip }} -U replication -p 5432 -D /var/lib/postgresql/17/main -Fp -Xs -P -R
+
+    - name: Change perm
+      shell : |
+        chown -R postgres:postgres /var/lib/postgresql/17/main
+        chmod -R 750 /var/lib/postgresql/17/main
+      notify: restart postgres
