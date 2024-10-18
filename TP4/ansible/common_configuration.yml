@@ -1,0 +1,102 @@
+- name: Master slaves common configuration
+  remote_user: ubuntu
+  become: true
+  hosts: proxy:master:slaves
+  
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Ping hosts
+      ping:
+
+    - name: Add pgdg repo to sources.list.d 
+      lineinfile: 
+        path: /etc/apt/sources.list.d/pgdg.list
+        line: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+        create: true
+
+    - name: Download PostgreSQL key and add it to system keyring
+      apt_key:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+    - name: Install acl (required package)
+      apt:
+        name: acl
+      register: acl_apt_result
+      until: acl_apt_result is succeeded
+      retries: 5
+      delay: 2
+
+    - name: Install postgresql
+      apt:
+        name: postgresql
+        state: present
+      register: postgres_apt_result
+      until: postgres_apt_result is succeeded
+      retries: 5
+      delay: 2
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - python3-pip
+        state: latest
+        update_cache: true
+
+    - name: Copy PostgreSQL configuration file
+      template:
+        src: ../templates/postgres_template.conf
+        dest: /etc/postgresql/17/main/postgresql.conf
+
+    - name: Replace listen adresses in postgresql_conf
+      replace:
+        path: /etc/postgresql/17/main/postgresql.conf
+        regexp: '{ instance_ip }'
+        replace: "{{ ansible_ssh_host }}"
+      notify: restart postgres
+
+    - name: Install psycopg2 python package (necessary package for ansible postgresql module)
+      pip:
+        name: psycopg2-binary
+
+    - name: Create replication user
+      postgresql_user:
+        name: replication
+        password: replication
+        role_attr_flags: REPLICATION,LOGIN
+      become: yes
+      become_user: postgres
+
+    - name: Grant user replication from network 172.28.0.0/16 access for replication
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/17/main/pg_hba.conf"
+        contype: host
+        users: replication
+        source: 172.28.0.0/16
+        method: md5
+        databases: replication
+
+    - name: Grant user replication from network 172.28.0.0/16 access for replication
+      postgresql_pg_hba:
+        dest: "/etc/postgresql/17/main/pg_hba.conf"
+        contype: host
+        users: postgres
+        source: 172.28.0.0/16
+        method: md5
+        databases: postgres
+      notify: restart postgres
+
+    - name: Change password for user postgres
+      become: yes
+      become_method: sudo
+      become_user: postgres
+      postgresql_user: 
+        name: postgres
+        password: postgres

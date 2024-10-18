@@ -1,0 +1,23 @@
+- name: Slaves configuration
+  remote_user: ubuntu
+  become: true
+  hosts: slaves
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Recursively remove directory
+      file:
+        path: /var/lib/postgresql/17/main/
+        state: absent
+
+    - name: Execute base backup
+      shell: export PGPASSWORD="replication" && /usr/bin/pg_basebackup -h {{ master_ip }} -U replication -p 5432 -D /var/lib/postgresql/17/main -Xs -P -Fp -R
+
+    - name: Change permissions
+      shell : |
+        chown -R postgres:postgres /var/lib/postgresql/17/main
+        chmod -R 750 /var/lib/postgresql/17/main
+      notify: restart postgres

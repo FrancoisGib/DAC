@@ -1,0 +1,19 @@
+- name: Master configuration
+  remote_user: ubuntu
+  become: true
+  hosts: master
+
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted
+
+  tasks:
+    - name: Create test_table
+      postgresql_table:
+        name: test_table
+        columns:
+        - id bigserial primary key
+        - name varchar(20)
+        owner: postgres
+      become: yes
+      become_user: postgres
