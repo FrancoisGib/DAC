@@ -85,7 +85,7 @@ chown -R postgres:postgres /var/lib/postgresql/17/main
 chmod -R 750 /var/lib/postgresql/17/main
 ```
 On relance postgres et on a nos deux slaves qui répliquent la base de données master.
-Si on effectue une modification sur la base de données du master, les 
+Si on effectue une modification sur la base de données du master, les modifications seront répliquées sur les slaves.
 
 On doit maintenant setup un proxy pour rediriger les requêtes sur les différents noeuds.
 
