@@ -14,7 +14,11 @@ ansible:
 update-images:
 	bash scripts/replace_templates.sh
 	bash scripts/build_images.sh
-	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/update_images.yml -i inventory.ini
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/webservers/update_images.yml -i inventory.ini
+
+update-instances-number:
+	bash scripts/replace_templates.sh
+	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/webservers/update_servers_number.yml -i inventory.ini
 
 clean:
 	terraform -chdir=terraform destroy -auto-approve

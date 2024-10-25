@@ -4,7 +4,7 @@
     source: pull
     force_source: yes # Always pull the latest image
 
-- name: Create webserver container (recreate if a new image is pull)
+- name: Create webserver container (recreate if a new image is pulled)
   docker_container:
     name: webserver
     image: francoisgib/dac-tp5:webserver

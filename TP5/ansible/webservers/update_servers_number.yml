@@ -1,0 +1,11 @@
+- name: Nginx configuration update
+  remote_user: ubuntu
+  become: true
+  hosts: webservers
+  gather_timeout: 60
+  tasks:
+    - name: Import webservers tasks
+      include_tasks: webservers_tasks.yml
+
+    - name: Import common tasks
+      include_tasks: ../common/common_tasks.yml

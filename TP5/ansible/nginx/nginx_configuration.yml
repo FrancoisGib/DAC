@@ -10,7 +10,7 @@
         source: pull
         force_source: yes # Always pull the latest image
 
-    - name: Create nginx container (recreate if a new image is pull)
+    - name: Create nginx container (recreate if a new image is pulled)
       docker_container:
         name: nginx-load-balancer
         image: francoisgib/dac-tp5:nginx-load-balancer
