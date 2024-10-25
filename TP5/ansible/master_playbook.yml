@@ -1,0 +1,8 @@
+- name: Include common configuration
+  import_playbook: common_configuration.yml
+
+- name: Include webservers configuration
+  import_playbook: webservers_configuration.yml
+
+- name: Include nginx proxy configuration
+  import_playbook: nginx_configuration.yml

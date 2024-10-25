@@ -1,0 +1,13 @@
+- name: Pull the webserver image
+  docker_image:
+    name: francoisgib/dac-tp5:webserver
+    source: pull
+    force_source: yes # Always pull the latest image
+
+- name: Create webserver container (recreate if a new image is pull)
+  docker_container:
+    name: webserver
+    image: francoisgib/dac-tp5:webserver
+    ports: "8080:8080"
+    restart_policy: always
+    hostname: "{{ ansible_hostname }}"

@@ -3,6 +3,7 @@
   become: true
   hosts: webservers
   gather_timeout: 60
+  serial: 1
   tasks:
     - name: Import webservers tasks
       include_tasks: webservers_tasks.yml

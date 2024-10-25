@@ -1,4 +1,6 @@
-ips=$(terraform output | grep -E "[1-9]+" | sed 's/"//g' | sed 's/ //g')
+#!/bin/bash
+
+ips=$(terraform output -state=terraform/terraform.tfstate | grep -E "[1-9]+" | sed 's/"//g' | sed 's/ //g')
 ips_array=($(echo $ips | tr ',' "\n"))
 
 nginx_proxy=${ips_array[0]}
@@ -17,14 +19,8 @@ webservers_ip_string=""
 
 for webserver_ip in ${webservers[@]} 
 do
-  webservers_ip_string+="server ${webserver_ip}:8080;\n\t\t"
+  webservers_ip_string+="server ${webserver_ip}:8080 max_fails=3 fail_timeout=10s;\n\t\t"
 done
 
 cat templates/template-nginx.conf > nginx/nginx.conf
 sed -i "s/{ instances_ip }/$(echo $webservers_ip_string)/g" nginx/nginx.conf
-
-export ANSIBLE_HOST_KEY_CHECKING=False
-
-ansible-playbook ansible/common_configuration.yml -i inventory.ini
-ansible-playbook ansible/nginx_configuration.yml -i inventory.ini
-ansible-playbook ansible/webservers_configuration.yml -i inventory.ini

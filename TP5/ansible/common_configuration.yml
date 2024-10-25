@@ -6,14 +6,15 @@
   tasks:
     - name: Wait 600 seconds for target connection to become reachable/usable
       wait_for_connection:
-        delay: 60
-        timeout: 300
+        timeout: 600
 
     - name: Install aptitude
       apt:
         name: aptitude
         state: latest
         update_cache: true
+      retries: 5
+      delay: 2
 
     - name: Install required system packages
       apt:
@@ -41,9 +42,6 @@
     - name: Update apt and install docker-ce
       apt:
         name: docker-ce
-        state: latest
-      register: docker_apt_result
-      until: docker_apt_result is succeeded
       retries: 5
       delay: 2
 

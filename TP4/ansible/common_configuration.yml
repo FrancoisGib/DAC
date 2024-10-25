@@ -11,7 +11,6 @@
   tasks:
     - name: Wait 600 seconds for target connection to become reachable/usable
       wait_for_connection:
-        delay: 60
         timeout: 300
 
     - name: Add pgdg repo to sources.list.d 
@@ -32,8 +31,6 @@
     - name: Install acl (required package)
       apt:
         name: acl
-      register: acl_apt_result
-      until: acl_apt_result is succeeded
       retries: 5
       delay: 2
 
@@ -41,8 +38,6 @@
       apt:
         name: postgresql
         state: present
-      register: postgres_apt_result
-      until: postgres_apt_result is succeeded
       retries: 5
       delay: 2
 
