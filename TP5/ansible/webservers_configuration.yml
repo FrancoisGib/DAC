@@ -1,0 +1,29 @@
+- name: Webservers configuration
+  remote_user: ubuntu
+  become: true
+  hosts: webservers
+  gather_timeout: 60
+  tasks:
+    - name: Copy folder
+      copy:
+        src: ../webapp/
+        dest: /home/ubuntu/webapp
+        force: true
+  
+    - name: Build an image
+      docker_image:
+        build:
+          path: ./webapp
+        name: webserver
+        tag: latest
+        source: build
+        force_tag: true
+        force_absent: true
+
+    - name: Create webserver container
+      docker_container:
+        name: webserver
+        image: "webserver:latest"
+        published_ports: "8080:8080"
+        recreate: true
+        restart_policy: always

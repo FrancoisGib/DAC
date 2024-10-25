@@ -2,6 +2,7 @@
   remote_user: ubuntu
   become: true
   hosts: master
+  gather_timeout: 60
 
   handlers:
     - name: restart postgres

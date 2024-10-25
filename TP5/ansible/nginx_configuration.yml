@@ -1,0 +1,29 @@
+- name: Nginx configuration
+  remote_user: ubuntu
+  become: true
+  hosts: proxy
+  gather_timeout: 60
+  tasks:
+    - name: Copy folder
+      copy:
+        src: ../nginx/
+        dest: /home/ubuntu/nginx
+        force: true
+  
+    - name: Build an image
+      docker_image:
+        build:
+          path: ./nginx
+        name: nginx-proxy
+        tag: latest
+        source: build
+        force: yes
+
+
+    - name: Create nginx container
+      docker_container:
+        name: nginx-proxy
+        image: "nginx-proxy:latest"
+        published_ports: "8080:80"
+        recreate: true
+        restart_policy: always

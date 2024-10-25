@@ -2,14 +2,17 @@
   remote_user: ubuntu
   become: true
   hosts: proxy:master:slaves
-  
+  gather_facts: no
+
   handlers:
     - name: restart postgres
       service: name=postgresql state=restarted
 
   tasks:
-    - name: Ping hosts
-      ping:
+    - name: Wait 600 seconds for target connection to become reachable/usable
+      wait_for_connection:
+        delay: 60
+        timeout: 300
 
     - name: Add pgdg repo to sources.list.d 
       lineinfile: 
