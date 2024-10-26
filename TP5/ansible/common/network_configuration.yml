@@ -1,0 +1,25 @@
+- name: Allow input on ssh port
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "22"
+    jump: ACCEPT
+
+- name: Allow output on ssh port
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    ctstate:
+      - ESTABLISHED
+    source_port: "22"
+    jump: ACCEPT
+
+- name: Set the policy for the OUTPUT chain to DROP
+  iptables:
+    chain: OUTPUT
+    policy: DROP
+
+- name: Set the policy for the INPUT chain to DROP
+  iptables:
+    chain: INPUT
+    policy: DROP

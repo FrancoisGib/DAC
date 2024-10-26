@@ -8,6 +8,12 @@
   docker_container:
     name: webserver
     image: francoisgib/dac-tp5:webserver
-    ports: "8080:8080"
+    network_mode: host
     restart_policy: always
     hostname: "{{ ansible_hostname }}"
+
+- name: Import webservers network configuration tasks
+  include_tasks: webservers_network_configuration.yml
+
+- name: Import network common configuration tasks
+  include_tasks: ../common/network_configuration.yml

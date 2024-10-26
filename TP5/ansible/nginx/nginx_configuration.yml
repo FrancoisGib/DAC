@@ -14,6 +14,9 @@
       docker_container:
         name: nginx-load-balancer
         image: francoisgib/dac-tp5:nginx-load-balancer
-        ports: "8080:80"
+        network_mode: host
         restart_policy: always
         hostname: "{{ ansible_hostname }}"
+
+    - name: Import nginx network configuration tasks
+      include_tasks: nginx_network_configuration.yml

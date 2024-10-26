@@ -2,13 +2,9 @@
   wait_for_connection:
     timeout: 600
 
-- name: Install aptitude
+- name: Update apt cache
   apt:
-    name: aptitude
-    state: latest
     update_cache: true
-  retries: 5
-  delay: 2
 
 - name: Install required system packages
   apt:
