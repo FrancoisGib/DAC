@@ -2,8 +2,16 @@
   remote_user: ubuntu
   become: true
   hosts: proxy
-  gather_timeout: 60
+  gather_facts: no
   tasks:
+    - name: Gather facts (just required configuration facts)
+      ansible.builtin.setup:
+        filter:
+          - 'ansible_hostname'
+
+    - name: Import accept policy tasks
+      include_tasks: ../common/accept_policy.yml
+
     - name: Pull the nginx-load-balancer image
       docker_image:
         name: francoisgib/dac-tp5:nginx-load-balancer
@@ -19,4 +27,4 @@
         hostname: "{{ ansible_hostname }}"
 
     - name: Import nginx network configuration tasks
-      include_tasks: nginx_network_configuration.yml
+      include_tasks: tasks/nginx_network_configuration.yml

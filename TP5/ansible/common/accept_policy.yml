@@ -1,0 +1,9 @@
+- name: Set the policy for the INPUT chain to ACCEPT
+  iptables:
+    chain: INPUT
+    policy: ACCEPT
+
+- name: Set the policy for the OUTPUT chain to ACCEPT
+  iptables:
+    chain: OUTPUT
+    policy: ACCEPT

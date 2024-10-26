@@ -1,8 +1,3 @@
-- name: Set the policy for the FORWARD chain to DROP
-  iptables:
-    chain: FORWARD
-    policy: DROP
-
 - name: Allow input on port 8080
   iptables:
     chain: INPUT
@@ -18,3 +13,14 @@
     source_port: "8080"
     destination: "{{ proxy_ip }}"
     jump: ACCEPT
+
+- name: Import allow ssh tasks
+  include_tasks: ../../common/allow_ssh.yml
+
+- name: Import drop policy tasks
+  include_tasks: ../../common/drop_policy.yml
+
+- name: Set the policy for the FORWARD chain to DROP
+  iptables:
+    chain: FORWARD
+    policy: DROP

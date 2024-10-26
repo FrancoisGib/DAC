@@ -2,7 +2,7 @@
   remote_user: ubuntu
   become: true
   hosts: proxy
-  gather_timeout: 60
+  gather_facts: no
   tasks:
     - name: Copy new configuration into instance
       template:

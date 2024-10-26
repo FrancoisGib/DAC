@@ -2,7 +2,7 @@
   remote_user: ubuntu
   become: true
   hosts: webservers
-  gather_timeout: 60
+  gather_facts: no
   tasks:
     - name: Import webservers tasks
-      include_tasks: webservers_tasks.yml
+      include_tasks: tasks/webservers_tasks.yml

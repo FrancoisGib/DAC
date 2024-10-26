@@ -30,4 +30,4 @@ EXPOSE 8080
 LABEL AUTHOR="François Gibier"
 
 # Run the application (CMD more flexible than ENTRYPOINT)
-CMD ["node", "src/index.js"]
+ENTRYPOINT ["node", "src/index.js"]

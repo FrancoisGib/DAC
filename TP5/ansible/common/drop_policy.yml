@@ -1,0 +1,9 @@
+- name: Set the policy for the INPUT chain to DROP
+  iptables:
+    chain: INPUT
+    policy: DROP
+
+- name: Set the policy for the OUTPUT chain to DROP
+  iptables:
+    chain: OUTPUT
+    policy: DROP

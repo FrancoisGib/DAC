@@ -5,3 +5,5 @@ Le but du TP est de mettre en place un load balancer qui redirige les requêtes 
 Voici le schéma de l'architecture mise en place dans ce TP.
 
 ![Architecture](./images/Architecture.svg)
+
+![Files structure](./images/files_structure.png)

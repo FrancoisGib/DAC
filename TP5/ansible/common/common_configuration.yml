@@ -1,8 +1,0 @@
-- name: Common configuration
-  remote_user: ubuntu
-  become: true
-  hosts: proxy:webservers
-  gather_facts: no
-  tasks:
-    - name: Import webservers tasks
-      include_tasks: common_tasks.yml

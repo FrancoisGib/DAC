@@ -1,5 +1,11 @@
-- name: Include common configuration
-  import_playbook: common/common_configuration.yml
+- name: Common configuration
+  remote_user: ubuntu
+  become: true
+  hosts: proxy:webservers
+  gather_facts: no
+  tasks:
+    - name: Import common tasks
+      include_tasks: common/common_tasks.yml
 
 - name: Include webservers configuration
   import_playbook: webservers/webservers_configuration.yml

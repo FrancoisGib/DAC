@@ -1,0 +1,15 @@
+- name: Allow input on ssh port (22)
+  iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: ssh
+    jump: ACCEPT
+
+- name: Allow output on ssh port (22)
+  iptables:
+    chain: OUTPUT
+    protocol: tcp
+    ctstate:
+      - ESTABLISHED
+    source_port: ssh
+    jump: ACCEPT

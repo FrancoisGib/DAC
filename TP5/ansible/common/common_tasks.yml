@@ -1,21 +1,21 @@
-- name: Wait 600 seconds for target connection to become reachable/usable
+- name: Wait for target connection to become reachable/usable
   wait_for_connection:
-    timeout: 600
+    timeout: 600  
+
+- name: Gather facts (just required configuration facts)
+  ansible.builtin.setup:
+    filter:
+      - 'ansible_distribution_release'
 
 - name: Update apt cache
   apt:
     update_cache: true
+  retries: 2
 
 - name: Install required system packages
   apt:
     pkg:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
       - python3-pip
-      - virtualenv
-      - python3-setuptools
     state: latest
     update_cache: true
 
@@ -26,15 +26,26 @@
 
 - name: Add Docker Repository
   apt_repository:
-    repo: deb https://download.docker.com/linux/ubuntu focal stable
+    repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
 
 - name: Update apt and install docker-ce
   apt:
     name: docker-ce
-  retries: 5
-  delay: 2
+  retries: 2
 
 - name: Install Docker Module for Python
   pip:
     name: docker
+
+- name: Allow loopback input 
+  iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT 
+
+- name: Allow loopback output
+  iptables:
+    chain: OUTPUT
+    out_interface: lo
+    jump: ACCEPT
