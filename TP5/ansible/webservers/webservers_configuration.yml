@@ -2,6 +2,7 @@
   remote_user: ubuntu
   become: true
   hosts: webservers
+  strategy: free
   gather_facts: no
   tasks:
     - name: Import webservers tasks

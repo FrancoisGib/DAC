@@ -9,11 +9,17 @@ webservers=("${ips_array[@]:1}")
 echo "Nginx proxy : $nginx_proxy"
 echo "Web servers : ${webservers[@]}"
 
+if [ -z $DOCKER_REPOSITORY_PATH ]
+then
+  export DOCKER_REPOSITORY_PATH="francoisgib\/dac-tp5"
+fi
+
 # Replace templates for configuration
 
 cat templates/template_inventory.ini > inventory.ini
 sed -i "s/{ nginx_proxy_ip }/$(echo $nginx_proxy | sed "s/ //g")/g" inventory.ini
 sed -i "s/{ webservers_ip }/$(echo ${webservers[@]} | sed 's/ /\\n/g')/g" inventory.ini
+sed -i "s/{ docker_repository_path }/$(echo "$DOCKER_REPOSITORY_PATH" | sed "s/ //g")/g" inventory.ini
 
 webservers_ip_string=""
 

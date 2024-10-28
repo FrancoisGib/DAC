@@ -14,17 +14,16 @@
 
     - name: Pull the nginx-load-balancer image
       docker_image:
-        name: francoisgib/dac-tp5:nginx-load-balancer
+        name: "{{ docker_repository }}:nginx-load-balancer"
         source: pull
         force_source: yes # Always pull the latest image
 
     - name: Create nginx container (recreate if a new image is pulled)
       docker_container:
         name: nginx-load-balancer
-        image: francoisgib/dac-tp5:nginx-load-balancer
+        image: "{{ docker_repository }}:nginx-load-balancer"
         network_mode: host
         restart_policy: always
-        hostname: "{{ ansible_hostname }}"
 
     - name: Import nginx network configuration tasks
       include_tasks: tasks/nginx_network_configuration.yml

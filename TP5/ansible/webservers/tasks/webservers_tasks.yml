@@ -8,7 +8,7 @@
 
 - name: Pull the webserver image
   docker_image:
-    name: francoisgib/dac-tp5:webserver
+    name: "{{ docker_repository }}:webserver"
     source: pull
     force_source: yes # Always pull the latest image
 
@@ -18,7 +18,7 @@
 - name: Create webserver container (recreate if a new image is pulled)
   docker_container:
     name: webserver
-    image: francoisgib/dac-tp5:webserver
+    image: "{{ docker_repository }}:webserver"
     network_mode: host
     restart_policy: always
     hostname: "{{ ansible_hostname }}"

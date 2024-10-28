@@ -6,7 +6,7 @@
   tasks:
     - name: Copy new configuration into instance
       template:
-        src: ../nginx/nginx.conf
+        src: ../../nginx/nginx.conf
         dest: nginx.conf
 
     - name: Copy new configuration into container

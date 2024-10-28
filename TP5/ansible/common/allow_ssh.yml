@@ -2,6 +2,7 @@
   iptables:
     chain: INPUT
     protocol: tcp
+    ctstate: ESTABLISHED,NEW
     destination_port: ssh
     jump: ACCEPT
 
@@ -9,7 +10,6 @@
   iptables:
     chain: OUTPUT
     protocol: tcp
-    ctstate:
-      - ESTABLISHED
+    ctstate: ESTABLISHED
     source_port: ssh
     jump: ACCEPT

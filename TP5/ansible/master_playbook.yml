@@ -1,7 +1,7 @@
 - name: Common configuration
   remote_user: ubuntu
   become: true
-  hosts: proxy:webservers
+  hosts: all
   gather_facts: no
   tasks:
     - name: Import common tasks

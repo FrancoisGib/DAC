@@ -1,14 +1,20 @@
 #!/bin/bash
-
-if [ ! -z $1 ] && [ $1 -eq 1 ]
+if [ -z $DOCKER_REPOSITORY_PATH ]
 then
-   docker build -t francoisgib/dac-tp5:webserver webserver
-else
-   gcc --static -o minimalserver/http minimalserver/http.c
-   docker build -t francoisgib/dac-tp5:webserver minimalserver
+  export DOCKER_REPOSITORY_PATH="francoisgib\/dac-tp5"
 fi
 
-docker build -t francoisgib/dac-tp5:nginx-load-balancer nginx
+docker_repository_path=$(echo "$DOCKER_REPOSITORY_PATH" | tr -d '\\')
 
-docker push francoisgib/dac-tp5:webserver
-docker push francoisgib/dac-tp5:nginx-load-balancer
+if [ ! -z $NODE_SERVER ]
+then
+   docker build -t $docker_repository_path:webserver webserver
+else
+   gcc --static -o minimalserver/http minimalserver/http.c
+   docker build -t $docker_repository_path:webserver minimalserver
+fi
+
+docker build -t $docker_repository_path:nginx-load-balancer nginx
+
+docker push $docker_repository_path:webserver
+docker push $docker_repository_path:nginx-load-balancer

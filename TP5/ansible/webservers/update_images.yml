@@ -2,7 +2,7 @@
   remote_user: ubuntu
   become: true
   hosts: webservers
-  serial: 1
+  serial: "50%"
   gather_facts: no
   tasks:
     - name: Import webservers tasks
