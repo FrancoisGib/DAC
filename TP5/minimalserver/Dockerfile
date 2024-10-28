@@ -9,4 +9,4 @@ EXPOSE 8080
 LABEL AUTHOR="François Gibier"
 
 # Run the application
-CMD ["/http", "8080"]
+CMD ["/http"]
