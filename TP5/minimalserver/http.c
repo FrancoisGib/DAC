@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_REQUEST_SIZE 2048
 #define PORT 8080
@@ -58,7 +59,6 @@ int main()
         if ((size = read(client_fd, buffer, MAX_REQUEST_SIZE)) != -1)
         {
             printf("%.*s", size, buffer);
-            memset(buffer, 0, size);
         }
 
         char hostname[_SC_HOST_NAME_MAX + 1];
@@ -68,9 +68,29 @@ int main()
         strcat(html_content, hostname);
         strcat(html_content, "</p>");
 
+        /*int i = 0;
+        char method[8];
+        while (i < 8 && buffer[i] != ' ')
+        {
+            method[i] = buffer[i];
+            i++;
+        }
+        method[i] = '\0';*/
+        char *method = strtok(buffer, " ");
+        printf("Method: %s\n", method);
+
         char response[128] =
             "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n";
+            "Content-Type: text/html\r\n"
+            "Access-Control-Allow-Origin: *\r\n";
+
+        char option_response[256] =
+            "HTTP/1.1 204 No Content\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
+            "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+            "Access-Control-Allow-Headers: Content-Type\r\n"
+            "Keep-Alive: timeout=2, max=100\r\n"
+            "Connection: Keep-Alive\r\n";
 
         int content_length = strlen(html_content);
         char buf[32];
