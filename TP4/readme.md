@@ -32,8 +32,8 @@ terraform apply terraform
 
 Selon les version de terraform, les commandes peuvent changer en:
 ```bash
-terraform init -chdir=terraform
-terraform apply -chdir=terraform
+terraform -chdir=terraform init
+terraform -chdir=terraform apply
 ```
 
 Ce qui va nous créé nos quatre instances.

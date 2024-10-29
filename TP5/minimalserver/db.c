@@ -1,78 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "./postgres/libpq-fe.h"
+#include "postgres/libpq-fe.h"
+
+void make_read_request() {
+   
+}
 
 int main(int argc, char *argv[])
 {
-   printf("libpq tutorial\n");
+   char *connection_info = "dbname=postgres user=postgres password=postgres host=172.28.100.142 port=5000";
 
-   // Connect to the database
-   // conninfo is a string of keywords and values separated by spaces.
-   char *conninfo = "dbname=postgres user=postgres password=postgres host=localhost port=5432";
+   // Initiate connection
+   PGconn *db_connection = PQconnectdb(connection_info);
 
-   // Create a connection
-   PGconn *conn = PQconnectdb(conninfo);
-
-   // Check if the connection is successful
-   if (PQstatus(conn) != CONNECTION_OK)
+   if (PQstatus(db_connection) != CONNECTION_OK)
    {
-      // If not successful, print the error message and finish the connection
-      printf("Error while connecting to the database server: %s\n", PQerrorMessage(conn));
-
-      // Finish the connection
-      PQfinish(conn);
-
-      // Exit the program
-      exit(1);
+      printf("Error while connecting to the database server: %s\n", PQerrorMessage(db_connection));
+      PQfinish(db_connection);
+      return -1;
    }
 
    // We have successfully established a connection to the database server
    printf("Connection Established\n");
-   printf("Port: %s\n", PQport(conn));
-   printf("Host: %s\n", PQhost(conn));
-   printf("DBName: %s\n", PQdb(conn));
+   printf("Port: %s\n", PQport(db_connection));
+   printf("Host: %s\n", PQhost(db_connection));
+   printf("DBName: %s\n", PQdb(db_connection));
 
    // Execute a query
-   char *query = "SELECT * FROM utilisateur";
+   char *query = "SELECT * FROM test_table;";
+   // char *query = "INSERT INTO test_table VALUES (1, 'nom')";
 
    // Submit the query and retrieve the result
-   PGresult *res = PQexec(conn, query);
+   PGresult *response = PQexec(db_connection, query);
 
    // Check the status of the query result
-   ExecStatusType resStatus = PQresultStatus(res);
+   ExecStatusType response_status = PQresultStatus(response);
 
    // Convert the status to a string and print it
-   printf("Query Status: %s\n", PQresStatus(resStatus));
+   printf("Query Status: %s\n", PQresStatus(response_status));
 
    // Check if the query execution was successful
-   if (resStatus != PGRES_TUPLES_OK)
+   if (response_status != PGRES_TUPLES_OK && response_status != PGRES_COMMAND_OK)
    {
-      // If not successful, print the error message and finish the connection
-      printf("Error while executing the query: %s\n", PQerrorMessage(conn));
-
-      // Clear the result
-      PQclear(res);
-
-      // Finish the connection
-      PQfinish(conn);
-
-      // Exit the program
-      exit(1);
+      printf("Error while executing the query: %s\n", PQerrorMessage(db_connection));
+      PQclear(response);
+      PQfinish(db_connection);
+      return -1;
    }
 
-   // We have successfully executed the query
    printf("Query Executed Successfully\n");
 
-   // Get the number of rows and columns in the query result
-   int rows = PQntuples(res);
-   int cols = PQnfields(res);
+   int rows = PQntuples(response);
+   int cols = PQnfields(response);
    printf("Number of rows: %d\n", rows);
    printf("Number of columns: %d\n", cols);
 
    // Print the column names
    for (int i = 0; i < cols; i++)
    {
-      printf("%s\t", PQfname(res, i));
+      printf("%s\t", PQfname(response, i));
    }
    printf("\n");
 
@@ -82,16 +68,12 @@ int main(int argc, char *argv[])
       for (int j = 0; j < cols; j++)
       {
          // Print the column value
-         printf("%s\t", PQgetvalue(res, i, j));
+         printf("%s\t", PQgetvalue(response, i, j));
       }
       printf("\n");
    }
-
-   // Clear the result
-   PQclear(res);
-
-   // Finish the connection
-   PQfinish(conn);
+   PQclear(response);
+   PQfinish(db_connection);
 
    return 0;
 }

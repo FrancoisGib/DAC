@@ -5,7 +5,7 @@
   gather_facts: no
   tasks:
     - name: Gather facts (just required configuration facts)
-      ansible.builtin.setup:
+      setup:
         filter:
           - 'ansible_hostname'
 
