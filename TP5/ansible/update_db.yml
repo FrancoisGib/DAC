@@ -1,0 +1,26 @@
+- name: Master configuration
+  hosts: master
+  tasks:
+    - name: Create replication slots
+      postgresql_query:
+        query: "SELECT pg_create_physical_replication_slot('{{ item }}_slot') 
+            WHERE NOT EXISTS (
+              SELECT 1 FROM pg_replication_slots 
+              WHERE slot_name = '{{ item }}_slot'
+            );"
+      become: yes
+      become_user: postgres
+      with_items: "{{ groups['slaves'] }}"
+
+- name: Slaves configuration
+  hosts: slaves
+  serial: "50%"
+  strategy: free
+  roles:
+    - postgres
+    - slave
+
+- name: Proxy configuration
+  hosts: proxy
+  roles:
+    - pgpool

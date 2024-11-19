@@ -1,0 +1,17 @@
+- name: Common configuration
+  hosts: webservers:proxy
+  roles:
+    - common
+
+- name: Common configuration
+  hosts: master:slaves
+  roles:
+    - postgres
+
+- name: Proxy configuration
+  hosts: proxy
+  roles:
+    - pgpool
+    - nginx
+    - prometheus
+    - grafana

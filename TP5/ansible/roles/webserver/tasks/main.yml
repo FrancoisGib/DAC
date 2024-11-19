@@ -1,0 +1,10 @@
+---
+- name: Import webservers tasks
+  include_tasks: configuration.yml
+
+- name: Import webservers tasks
+  include_tasks: docker.yml
+
+# - name: Import network tasks
+#   include_tasks: network.yml
+...

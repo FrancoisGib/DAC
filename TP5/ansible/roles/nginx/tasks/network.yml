@@ -1,0 +1,16 @@
+---
+- name: Check if the table exists
+  command: nft list table nginx_table
+  register: nginx_table_check
+  failed_when: false
+
+- name: Copy nftables nginx configuration
+  copy:
+    src: nftables.conf
+    dest: /tmp/
+  when: nginx_table_check.stdout == ""
+
+- name: Apply nftables nginx configuration
+  command: nft -f /tmp/nftables.conf
+  when: nginx_table_check.stdout == ""
+...

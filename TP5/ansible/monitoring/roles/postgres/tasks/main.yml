@@ -1,0 +1,15 @@
+- name: Pull the node exporter image
+  docker_image:
+    name: quay.io/prometheuscommunity/postgres-exporter
+    source: pull
+
+- name: Create postgres node exporter container # Port 9187
+  docker_container:
+    name: postgres_node_exporter
+    image: quay.io/prometheuscommunity/postgres-exporter
+    network_mode: host
+    restart_policy: unless-stopped
+    env:
+      DATA_SOURCE_URI: "localhost:5432/postgres?sslmode=disable"
+      DATA_SOURCE_USER: postgres
+      DATA_SOURCE_PASS: postgres

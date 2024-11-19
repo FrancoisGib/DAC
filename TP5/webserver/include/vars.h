@@ -1,0 +1,16 @@
+#define MAX_RESPONSE_SIZE 2048
+#define MAX_REQUEST_SIZE 2048
+#define MAX_REQUEST_BODY_SIZE 16384
+#define MAX_FILE_READ_SIZE 1024
+
+#ifndef RESPONSE_DELAY
+#define RESPONSE_DELAY 0
+#endif
+
+#ifndef NB_PROCESSES
+#define NB_PROCESSES 10
+#endif
+
+#ifndef LOGGING
+#define LOGGING 0
+#endif

@@ -1,0 +1,51 @@
+- name: Include gather facts from shared role
+  include_role:
+    name: shared
+    tasks_from: gather_facts
+
+- name: Copy configuration file into instance
+  copy:
+    src: master_postgresql.conf
+    dest: /etc/postgresql/16/main/postgresql.conf
+
+- name: restart postgres
+  service: 
+    name: postgresql 
+    state: restarted
+
+- name: Create replicator user
+  postgresql_user:
+    name: replicator
+    password: replicator
+    role_attr_flags: REPLICATION
+  become: yes
+  become_user: postgres
+
+- name: Create replication slots
+  postgresql_query:
+    query: "SELECT pg_create_physical_replication_slot('{{ item }}_slot') 
+        WHERE NOT EXISTS (
+          SELECT 1 FROM pg_replication_slots 
+          WHERE slot_name = '{{ item }}_slot'
+        );"
+  become: yes
+  become_user: postgres
+  with_items: "{{ groups['slaves'] }}"
+
+- name: Create test_table
+  postgresql_table:
+    db: postgres
+    name: test_table
+    columns:
+    - id bigserial primary key
+    - username varchar(20)
+    - password varchar(20)
+    owner: postgres
+  become: yes
+  become_user: postgres
+
+- name: Insert query to test_table into postgres db
+  postgresql_query:
+    query: INSERT INTO test_table (id, username, password) VALUES (1, 'username', 'password');
+  become: yes
+  become_user: postgres

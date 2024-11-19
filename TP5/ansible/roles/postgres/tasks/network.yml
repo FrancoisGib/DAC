@@ -1,0 +1,16 @@
+---
+- name: Check if the table exists
+  command: nft list table postgres_table
+  register: postgres_table_check
+  failed_when: false
+
+- name: Copy nftables postgres configuration
+  template:
+    src: nftables.conf.j2
+    dest: /tmp/nftables.conf
+  when: postgres_table_check.stdout == ""
+
+- name: Apply nftables postgres configuration
+  command: nft -f /tmp/nftables.conf
+  when: postgres_table_check.stdout == ""
+...

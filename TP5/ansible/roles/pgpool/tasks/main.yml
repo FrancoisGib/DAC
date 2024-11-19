@@ -1,0 +1,31 @@
+---
+- name: Include configure from shared role
+  include_role:
+    name: shared
+    tasks_from: install_packages
+
+- name: Generate dynamic env file
+  template:
+    src: env.j2
+    dest: ./env
+
+- name: Set environments variables
+  shell: |
+    set -o allexport
+    source ./env
+    set +o allexport
+
+- name: Pull the pgpool bitnami image
+  docker_image:
+    name: "bitnami/pgpool"
+    source: pull
+    force_source: yes
+
+- name: Create PgPool container (recreate if a new image is pulled)
+  docker_container:
+    name: pgpool
+    image: "bitnami/pgpool"
+    network_mode: "host"
+    restart_policy: always
+    env_file: ./env
+...

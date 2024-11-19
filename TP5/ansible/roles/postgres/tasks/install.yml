@@ -1,0 +1,21 @@
+---
+- name: Include gather facts from shared role
+  include_role:
+    name: shared
+    tasks_from: gather_facts
+
+- name: Add pgdg repo to sources.list.d 
+  lineinfile: 
+    path: /etc/apt/sources.list.d/pgdg.list
+    line: "deb http://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    create: true
+
+- name: Download PostgreSQL key and add it to system keyring
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Include install packages from shared role
+  include_role:
+    name: shared
+    tasks_from: install_packages

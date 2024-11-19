@@ -1,33 +1,43 @@
-# Build environment using a lightweight node image (alpine)
-FROM node:alpine AS build
+# Build image
+FROM alpine AS build
 
-# Copy application files into container
-COPY app /app
 WORKDIR /app
 
-# Remove all files without js or json extension
-RUN find . -type f ! -iname "*.js" -and ! -iname "*.json" -delete
+# Install required libraries to build app
+RUN apk --no-cache add libc-dev gcc make libpq-dev
 
-# Install production dependencies only
-RUN npm install --omit=dev
+# Include application files
+COPY include ./include
+COPY src ./src
+COPY makefile ./
+
+# Build application
+RUN make http
 
 
-# Run environment using a lightweight image (alpine)
-FROM alpine:latest
+# Runtime image
+FROM alpine
 
-# Install nodejs
-RUN apk add nodejs
+# Install required libraries to run the application
+RUN apk --no-cache add libpq-dev
 
-# Copy applications and it's dependencies
-COPY --from=build app /app
 WORKDIR /app
 
-# Remove useless files
-RUN rm package.json package-lock.json
+# Copy exectutable from previous build
+COPY --from=build app/http .
 
-# Documentation
-EXPOSE 8080
+# Copy certs and files served by server
+COPY cert ./cert
+COPY public ./public
+
+# Set the default env variables
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_URL=localhost
+ENV SERVER_PORT=8080
+
+# Documentation of the exposed port
+EXPOSE $POSTGRES_PORT
 LABEL AUTHOR="François Gibier"
 
-# Run the application (CMD more flexible than ENTRYPOINT)
-ENTRYPOINT ["node", "src/index.js"]
+# Start the server
+CMD ["./http", "8080"]

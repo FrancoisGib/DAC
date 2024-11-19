@@ -1,0 +1,24 @@
+---
+- name: Wait for connection
+  wait_for_connection:
+
+- name: Update apt cache
+  apt:
+    update_cache: true
+  retries: 2
+
+# - name: Check if the table exists
+#   command: nft list table common_table
+#   register: common_table_check
+#   failed_when: false
+
+# - name: Copy nftables common configuration
+#   copy:
+#     src: ../files/nftables_common.conf
+#     dest: /tmp/
+#   when: common_table_check.stdout == ""
+
+# - name: Apply nftables common configuration
+#   command: nft -f /tmp/nftables_common.conf
+#   when: common_table_check.stdout == ""
+...

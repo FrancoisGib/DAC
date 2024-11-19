@@ -1,0 +1,16 @@
+- name: Pull the node exporter image
+  docker_image:
+    name: quay.io/prometheus/node-exporter
+    source: pull
+
+- name: Create node exporter container # Port 9100
+  docker_container:
+    name: node_exporter
+    image: quay.io/prometheus/node-exporter
+    network_mode: host
+    pid_mode: host
+    restart_policy: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'

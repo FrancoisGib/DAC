@@ -1,0 +1,12 @@
+- name: Pull the nginx:alpine-slim image
+  docker_image:
+    name: "{{ docker_image_name }}"
+    source: pull
+    force_source: yes
+
+- name: Create nginx container (recreate if a new image is pulled)
+  docker_container:
+    name: "{{ docker_container_name }}"
+    image: "{{ docker_image_name }}"
+    network_mode: "{{ docker_network_mode }}"
+    restart_policy: "{{ docker_container_restart_policy }}"

@@ -1,0 +1,13 @@
+---
+servers_group_name: webservers
+docker_image_name: nginx:alpine-slim
+nginx_config_template: template-nginx.conf.j2
+
+required_packages:
+  apt:
+    - docker.io
+  pip:
+    - docker
+  pkg:
+    - python3-pip
+...

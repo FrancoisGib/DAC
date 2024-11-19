@@ -1,0 +1,8 @@
+# Webserver nftables config
+table ip webserver_table {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        ip saddr {{ servers_subnet }} tcp dport 8080 accept
+        drop
+    }
+}

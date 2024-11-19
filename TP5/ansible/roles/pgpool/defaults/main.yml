@@ -1,0 +1,14 @@
+---
+pgpool_port: 5432
+pgpool_max_pool: 4
+pgpool_user: postgres
+pgpool_password: postgres
+
+required_packages:
+  apt:
+    - docker.io
+  pip:
+    - docker
+  pkg:
+    - python3-pip
+...

@@ -1,0 +1,11 @@
+---
+- name: Reload Nginx
+  community.docker.docker_container_exec:
+    container: nginx-load-balancer
+    command: /bin/sh -c "nginx -s reload"
+
+- name: Restart Nginx
+  community.docker.docker_container_exec:
+    container: nginx-load-balancer
+    command: /bin/sh -c "nginx -s restart"
+...

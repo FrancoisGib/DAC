@@ -1,0 +1,32 @@
+- name: Include gather facts from shared role
+  include_role:
+    name: shared
+    tasks_from: gather_facts
+
+- name: stop postgres
+  service: 
+    name: postgresql 
+    state: stopped
+
+- name: remove data directory
+  shell: rm -rf /var/lib/postgresql/16/main/*
+  become: yes
+
+- name: backup
+  command: "pg_basebackup -h {{ master_ip }} -D /var/lib/postgresql/16/main -U replicator -P -v -R -X stream -S {{ inventory_hostname }}_slot"
+  become: yes
+  become_user: postgres
+  environment:
+    PGPASSWORD: replicator
+
+- name: Copy configuration file into instance
+  template:
+    src: slave_postgresql.conf.j2
+    dest: /etc/postgresql/16/main/postgresql.conf
+  become: yes
+  become_user: postgres
+
+- name: start postgres
+  service: 
+    name: postgresql
+    state: started

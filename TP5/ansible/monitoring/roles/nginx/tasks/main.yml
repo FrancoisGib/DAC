@@ -1,0 +1,13 @@
+- name: Pull the node exporter image
+  docker_image:
+    name: nginx/nginx-prometheus-exporter:1.3.0
+    source: pull
+
+- name: Create Nginx node exporter container # Port 9113
+  docker_container:
+    name: nginx_exporter
+    image: nginx/nginx-prometheus-exporter:1.3.0
+    network_mode: host
+    command:
+      - "--nginx.scrape-uri=http://localhost:9999/metrics"
+    restart_policy: unless-stopped

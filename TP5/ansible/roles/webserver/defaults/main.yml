@@ -1,0 +1,14 @@
+---
+docker_repository: francoisgib/dac-tp5
+
+required_facts:
+  - ansible_hostname
+
+required_packages:
+  apt:
+    - docker.io
+  pip:
+    - docker
+  pkg:
+    - python3-pip
+...

@@ -1,0 +1,34 @@
+global
+   maxconn 100
+ 
+defaults
+   log global
+   mode tcp
+   retries 2
+   timeout client 30m
+   timeout connect 4s
+   timeout server 30m
+   timeout check 5s
+ 
+listen stats
+   mode http
+   bind *:7000
+   stats enable
+   stats uri /
+ 
+listen pgReadWrite
+   bind *:5001
+   option pgsql-check user postgres
+   default-server inter 3s fall 3
+{% for instance in groups['master'] %}
+   server pg0 {{ hostvars[instance]['ansible_host'] }}:5432 check port 5432
+{% endfor %}
+ 
+listen pgReadOnly
+   bind *:5000
+   option pgsql-check user postgres
+   default-server inter 3s fall 3
+{% set combined_groups = groups['slaves'] + groups['master'] %}
+{% for instance in combined_groups %}
+   server pg{{loop.index0}} {{ hostvars[instance]['ansible_host'] }}:5432 check port 5432
+{% endfor %}

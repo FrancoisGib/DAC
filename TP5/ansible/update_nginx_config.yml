@@ -1,0 +1,4 @@
+- name: Nginx configuration
+  hosts: proxy
+  roles:
+    - nginx

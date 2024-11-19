@@ -1,0 +1,15 @@
+---
+- name: Include configure from shared role
+  include_role:
+    name: shared
+    tasks_from: install_packages
+
+- name: Import docker tasks
+  include_tasks: docker.yml
+
+- name: Import nginx configuration tasks
+  include_tasks: configure.yml
+
+# - name: Import nginx network configuration tasks
+#   include_tasks: network.yml
+...

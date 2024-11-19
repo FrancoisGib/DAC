@@ -1,0 +1,46 @@
+events {
+    worker_connections 2048;
+    multi_accept on;
+    use epoll;
+}
+
+http {
+    upstream backend {
+        {% for host in groups[servers_group_name] %}
+        server {{ hostvars[host]['ansible_host'] }}:8080 max_fails=3 fail_timeout=10s;
+        {% endfor %}
+    }
+    
+    client_body_timeout 60s;
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    server {
+        listen localhost:9999;
+        location /metrics {
+            stub_status on;
+        }
+    }
+
+    server {
+        # SSL configuration
+        ssl_certificate /etc/nginx/cert/cert.pem;
+        ssl_certificate_key /etc/nginx/cert/key.pem;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        listen 443 ssl;
+        
+        location / {
+            proxy_pass https://backend;
+
+            proxy_http_version 1.1;
+            proxy_set_header Connection "close";
+            
+            proxy_request_buffering off;
+            
+            proxy_next_upstream error timeout http_502 non_idempotent;
+            proxy_next_upstream_tries 3;
+            proxy_next_upstream_timeout 20s;
+        }
+    }
+}

@@ -1,14 +1,27 @@
-- name: Common configuration
-  remote_user: ubuntu
-  become: true
-  hosts: all
-  gather_facts: no
-  tasks:
-    - name: Import common tasks
-      include_tasks: common/common_tasks.yml
+- name: Webservers configuration
+  hosts: webservers
+  roles:
+    - webserver
 
-- name: Include webservers configuration
-  import_playbook: webservers/webservers_configuration.yml
+- name: Master and slaves db configuration
+  hosts: slaves:master
+  roles:
+    - postgres
 
-- name: Include nginx proxy configuration
-  import_playbook: nginx/nginx_configuration.yml
+- name: Master configuration
+  hosts: master
+  roles:
+    - master
+
+- name: Slaves configuration
+  hosts: slaves
+  roles:
+    - slave
+
+- name: Proxy configuration
+  hosts: proxy
+  roles:
+    - nginx
+    - pgpool
+
+- import_playbook: monitoring/playbook.yml

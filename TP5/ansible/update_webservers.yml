@@ -1,0 +1,6 @@
+- name: Webservers configuration
+  hosts: webservers
+  serial: "50%"
+  strategy: free
+  roles:
+    - webserver

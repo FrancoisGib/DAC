@@ -1,0 +1,30 @@
+- name: Replace template and copy configuration file into instance
+  template:
+    src: "{{ nginx_config_template }}"
+    dest: /tmp/nginx.conf
+
+- name: Copy new configuration into container
+  community.docker.docker_container_copy_into:
+    container: "{{ docker_container_name }}"
+    path: /tmp/nginx.conf
+    container_path: "{{ nginx_configuration_folder }}/nginx.conf"
+
+- name: Copy certificates
+  copy:
+    src: ../files/cert/
+    dest: /tmp/cert/
+
+- name: Create cert dir
+  community.docker.docker_container_exec:
+    container: "{{ docker_container_name }}"
+    command: "mkdir -p {{ nginx_configuration_folder }}/cert"
+
+- name: Copy certificates into container
+  community.docker.docker_container_copy_into:
+    container: "{{ docker_container_name }}"
+    path: "/tmp/cert/{{ item }}"
+    container_path: "{{ nginx_configuration_folder }}/cert/{{ item }}"
+  loop:
+    - key.pem
+    - cert.pem
+  notify: Reload Nginx

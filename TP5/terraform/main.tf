@@ -9,8 +9,8 @@ required_version = ">= 0.13.4"
   }
 }
 
-resource openstack_compute_instance_v2 "nginx-proxy" {
-  name        = "nginx-proxy"
+resource openstack_compute_instance_v2 "proxy" {
+  name        = "proxy"
   image_name  = "ubuntu22.04"
   flavor_name = "normale"
   key_pair    = "user_key"
@@ -25,13 +25,13 @@ resource openstack_compute_instance_v2 "nginx-proxy" {
   ]
 }
 
-resource openstack_compute_instance_v2 "webservers" {
-  name        = "webservers"
+resource openstack_compute_instance_v2 "servers" {
+  count = 3
+  name        = "server-${count.index}"
   image_name  = "ubuntu22.04"
   flavor_name = "normale"
   key_pair    = "user_key"
   security_groups = ["default"]
-  count = 2
 
   metadata = {
     app = "ubuntu"
@@ -42,13 +42,19 @@ resource openstack_compute_instance_v2 "webservers" {
   ]
 }
 
-output "nginx-proxy" {
-  value = openstack_compute_instance_v2.nginx-proxy.*.access_ip_v4
-  description = "The IP address of the created OpenStack instance(s)"
+variable "template_file" {
+  description = "Template file path"
+  type        = string
+  default     = "../templates/inventory.tpl"
 }
 
-output "webservers" {
-  value = openstack_compute_instance_v2.webservers.*.access_ip_v4
-  description = "The IP address of the created OpenStack instance(s)"
+output "inventory_ini" {
+  sensitive = true
+  value = templatefile(var.template_file, {
+    proxy      = openstack_compute_instance_v2.proxy,
+    webservers = openstack_compute_instance_v2.servers,
+    master     = openstack_compute_instance_v2.servers[0],
+    slaves     = slice(openstack_compute_instance_v2.servers, 1, length(openstack_compute_instance_v2.servers))
+  })
+  description = "Ansible inventory.ini formatted output"
 }
-

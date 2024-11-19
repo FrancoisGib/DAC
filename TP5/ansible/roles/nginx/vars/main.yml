@@ -1,0 +1,6 @@
+---
+docker_container_name: nginx-load-balancer
+docker_network_mode: host
+docker_container_restart_policy: always
+nginx_configuration_folder: /etc/nginx
+...

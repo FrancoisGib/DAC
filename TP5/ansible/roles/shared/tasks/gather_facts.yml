@@ -1,0 +1,8 @@
+---
+- name: Gather facts (just required configuration facts)
+  setup:
+    filter: "{{ required_facts }}"
+  when: 
+    - "required_facts is defined"
+    - "required_facts | length > 0"
+...

@@ -1,0 +1,13 @@
+- name: Pull the node exporter image
+  docker_image:
+    name: pgpool/pgpool2_exporter
+    source: pull
+
+- name: Create postgres node exporter container # Port 9719
+  docker_container:
+    name: pgpool2_exporter
+    image: pgpool/pgpool2_exporter
+    network_mode: host
+    restart_policy: unless-stopped
+    env:
+      PGPOOL_SERVICE_PORT: "5432"

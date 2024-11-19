@@ -1,0 +1,92 @@
+- name: Pull the Grafana image
+  docker_image:
+    name: grafana/grafana-enterprise
+    source: pull
+
+- name: Create Grafana container
+  docker_container:
+    name: grafana
+    image: grafana/grafana-enterprise
+    network_mode: host
+    restart_policy: unless-stopped
+    env:
+      GF_SECURITY_ADMIN_USER: "admin"
+      GF_SECURITY_ADMIN_PASSWORD: "password"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    state: started
+
+- name: Wait for Grafana to be ready
+  uri:
+    url: http://localhost:3000
+    status_code: 200
+    timeout: 60
+  register: grafana_status
+  retries: 10
+  delay: 5
+  until: grafana_status.status == 200
+
+- name: Create System Metrics datasource
+  grafana_datasource:
+    name: Prometheus
+    ds_type: prometheus
+    ds_url: http://localhost:9090
+    grafana_url: http://localhost:3000
+    url_username: admin
+    url_password: password
+    state: present
+
+- name: Copy systems dashboard
+  copy:
+    src: systems_dashboard2.json
+    dest: /tmp/systems_dashboard.json
+
+- name: Import dashboard for System metrics
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/systems_dashboard.json
+
+- name: Copy postgres dashboard
+  copy:
+    src: postgres_dashboard.json
+    dest: /tmp/postgres_dashboard.json
+
+- name: Import dashboard for PostgreSQL metrics
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/postgres_dashboard.json
+
+- name: Copy nginx dashboard
+  copy:
+    src: nginx_dashboard.json
+    dest: /tmp/nginx_dashboard.json
+
+- name: Import dashboard for Nginx metrics
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/nginx_dashboard.json
+
+- name: Copy pgpool dashboard
+  copy:
+    src: pgpool_dashboard.json
+    dest: /tmp/pgpool_dashboard.json
+
+- name: Import dashboard for Pgpool metrics
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/pgpool_dashboard.json

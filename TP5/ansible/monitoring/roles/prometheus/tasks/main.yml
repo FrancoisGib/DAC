@@ -1,0 +1,19 @@
+- name: Replace template and copy configuration file into instance
+  template:
+    src: templates/prometheus.yml.j2
+    dest: ./prometheus.yml
+
+- name: Pull the prometheus image
+  docker_image:
+    name: prom/prometheus
+    source: pull
+
+- name: Create prometheus container # Port 9090
+  docker_container:
+    name: prometheus
+    image: prom/prometheus
+    network_mode: host
+    restart_policy: unless-stopped
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+    restart: true

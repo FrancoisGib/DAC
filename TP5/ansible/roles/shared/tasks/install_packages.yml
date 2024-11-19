@@ -1,0 +1,32 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+
+- name: Install required apt packages
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+  retries: 3
+  with_items: "{{ required_packages.apt }}"
+  when: 
+    - "required_packages.apt is defined"
+    - "required_packages.apt | length > 0"
+
+- name: Install required pkg packages
+  apt:
+    pkg: "{{ required_packages.pkg }}"
+  retries: 3
+  when:
+    - "required_packages.pkg is defined"
+    - "required_packages.pkg | length > 0"
+
+- name: Install required pip packages
+  pip:
+    name: "{{ item }}"
+  retries: 3
+  with_items: "{{ required_packages.pip }}"
+  when: 
+    - "required_packages.pip is defined"
+    - "required_packages.pip | length > 0"
+...

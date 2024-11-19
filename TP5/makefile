@@ -1,35 +1,30 @@
 all:
-	make terraform -B
-	bash scripts/replace_templates.sh
-	bash scripts/build_images.sh
-	make ansible -B
-
-all-no-build:
-	make terraform -B
-	bash scripts/replace_templates.sh
-	make ansible -B
-	make update-nginx-config -B
-
-terraform:
 	terraform -chdir=terraform init
-	terraform -chdir=terraform apply -auto-approve
+	terraform -chdir=terraform apply -var "template_file=../templates/inventory.tpl" -auto-approve
+	terraform -chdir=terraform output -raw inventory_ini > inventory.ini
+	ansible-playbook ansible/master_playbook.yml
 
-ansible:
-	bash scripts/ansible_config.sh
-
-update-webservers-images:
-	bash scripts/replace_templates.sh
-	bash scripts/build_images.sh
-	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/webservers/update_images.yml -i inventory.ini
+all-old-terraform-version:
+	terraform init terraform
+	terraform apply -auto-approve -var "template_file=./templates/inventory.tpl" terraform
+	terraform output inventory_ini > inventory.ini
+	ansible-playbook ansible/master_playbook.yml
+	
+update-webservers-images: build_webserver_image
+	ansible-playbook ansible/update_webservers.yml
 
 update-instances-number:
-	bash scripts/replace_templates.sh
-	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/webservers/update_servers_number.yml -i inventory.ini
-	make update-nginx-config -B
+	terraform output inventory_ini > inventory.ini
+	ansible-playbook ansible/update_webservers.yml
 
 update-nginx-config:
-	ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook ansible/nginx/update_config.yml -i inventory.ini
+	ansible-playbook ansible/update_nginx_config.yml
+
+build_webserver_image:
+	docker build -t francoisgib/dac-tp5:webserver ./webserver
+	docker push francoisgib/dac-tp5:webserver
 
 clean:
-	rm -rf nginx/nginx.conf inventory.ini terraform/.terraform* terraform/terraform.* minimalserver/http minimalserver/db
+	rm -rf nginx/nginx.conf inventory.ini minimalserver/http minimalserver/db haproxy.cfg inventory.ini
 	terraform -chdir=terraform destroy -auto-approve
+	

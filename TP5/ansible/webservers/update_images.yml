@@ -1,9 +1,0 @@
-- name: Webservers configuration
-  remote_user: ubuntu
-  become: true
-  hosts: webservers
-  serial: "50%"
-  gather_facts: no
-  tasks:
-    - name: Import webservers tasks
-      include_tasks: tasks/webservers_tasks.yml

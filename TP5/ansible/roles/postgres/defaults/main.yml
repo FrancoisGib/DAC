@@ -1,0 +1,13 @@
+---
+required_packages:
+  apt:
+    - acl
+    - postgresql-16
+  pkg:
+    - python3-pip
+  pip:
+    - psycopg2-binary
+
+required_facts:
+  - 'ansible_distribution_release'
+...

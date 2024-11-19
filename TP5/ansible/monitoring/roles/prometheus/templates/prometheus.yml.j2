@@ -1,0 +1,28 @@
+scrape_configs:
+  - job_name: Systems metrics
+    static_configs:
+    {% for host in groups['webservers'] + groups['proxy'] %}
+    - targets: ['{{ hostvars[host]['ansible_host'] }}:9100']
+          labels:
+            alias: {{ hostvars[host]['inventory_hostname'] }}
+    {% endfor %}
+
+  - job_name: PostgreSQL Metrics
+    static_configs:
+    {% for host in groups['master'] + groups['slaves'] %}
+    - targets: ['{{ hostvars[host]['ansible_host'] }}:9187']
+          labels:
+            alias: {{ hostvars[host]['inventory_hostname'] }}
+    {% endfor %}
+
+  - job_name: PgPool Metrics
+    static_configs:
+      - targets: ['{{ proxy_ip }}:9719']
+        labels:
+          alias: PgPool
+
+  - job_name: Nginx Metrics
+    static_configs:
+      - targets: ['{{ proxy_ip }}:9113']
+        labels:
+          alias: Nginx
