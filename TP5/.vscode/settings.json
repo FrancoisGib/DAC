@@ -1,9 +1,0 @@
-{
-   "files.associations": {
-      "*.tsx": "typescriptreact",
-      "stdio.h": "c",
-      "libpq-fe.h": "c",
-      "stdlib.h": "c",
-      "in.h": "c"
-   }
-}
