@@ -11,8 +11,25 @@
       <p>Simple form</p>
       <input name="name" type="name" id="name-input" placeholder="name" />
       <input name="password" type="password" id="password-input" placeholder="password" />
-      <input type="button" name="fetch" value="fetch" id="fetch-button" />
+      <input type="button" name="login" value="Login" id="fetch-button" />
       <p id="content-p"></p>
+   </br>
+      <input type="button" name="increase-memory" value="Increase memory" id="increase-button" />
+      <input type="button" name="decrease-memory" value="Decrease memory" id="decrease-button" />
+      <input type="number" name="set-memory-input" id="set-memory-input" />
+      <input type="button" name="set-memory-button" value="Allocate memory (mo, max 2147)" id="set-memory-button" />
+      <p id="memory-used-p">Memory used: 0</p>
+   </br>
+      <label for="set-threads-input" >Nb threads:</label>
+      <input type="number" name="set-threads-input" id="set-threads-input" />
+      <input type="button" name="set-threads-button" value="Start threads with loop" id="set-threads-button" />
+   </br>
+      <label for="set-delay-input" >Delay:</label>
+      <input type="number" name="set-delay-input" id="set-delay-input" />
+      <input type="button" name="set-delay-button" value="Request with delay" id="set-delay-button" />
+   </br></br>
+      <input type="button" name="linpack-button" value="Start Linpack stress test" id="linpack-button" />
+      <p id="linpack-p"></p>
    </div>
    <script src="./index.js"></script>
 </body>

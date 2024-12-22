@@ -13,10 +13,6 @@ all-old-terraform-version:
 update-webservers-images: build_webserver_image
 	ansible-playbook ansible/update_webservers.yml
 
-update-instances-number:
-	terraform output inventory_ini > inventory.ini
-	ansible-playbook ansible/update_webservers.yml
-
 update-nginx-config:
 	ansible-playbook ansible/update_nginx_config.yml
 
@@ -25,6 +21,6 @@ build_webserver_image:
 	docker push francoisgib/dac-tp5:webserver
 
 clean:
-	rm -rf nginx/nginx.conf inventory.ini minimalserver/http minimalserver/db haproxy.cfg inventory.ini
+	rm inventory.ini
 	terraform -chdir=terraform destroy -auto-approve
 	

@@ -1,16 +1,16 @@
 ---
 - name: Check if the table exists
-  command: nft list table webserver_table
+  ansible.builtin.command: nft list table webserver_table
   register: webserver_table_check
   failed_when: false
 
 - name: Copy nftables webserver configuration
-  template:
+  ansible.builtin.template:
     src: nftables.conf.j2
     dest: /tmp/nftables.conf
   when: webserver_table_check.stdout == ""
 
 - name: Apply nftables webserver configuration
-  command: nft -f /tmp/nftables.conf
+  ansible.builtin.command: nft -f /tmp/nftables.conf
   when: webserver_table_check.stdout == ""
 ...

@@ -1,5 +1,5 @@
 - name: Copy configuration file into instance
-  copy:
+  ansible.builtin.copy:
     src: pg_hba.conf
     dest: /etc/postgresql/16/main/pg_hba.conf
 
@@ -7,6 +7,6 @@
   become: yes
   become_method: sudo
   become_user: postgres
-  postgresql_user: 
+  community.general.postgresql_user: 
     name: postgres
     password: postgres

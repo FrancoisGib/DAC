@@ -1,9 +1,9 @@
 - name: Include gather_facts from shared role
-  include_role:
+  ansible.builtin.include_role:
     name: shared
     tasks_from: gather_facts
 
 - name: Include install packages from shared role
-  include_role:
+  ansible.builtin.include_role:
     name: shared
     tasks_from: install_packages

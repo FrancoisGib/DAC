@@ -1,5 +1,5 @@
 - name: Replace template and copy configuration file into instance
-  template:
+  ansible.builtin.template:
     src: "{{ nginx_config_template }}"
     dest: /tmp/nginx.conf
 
@@ -10,7 +10,7 @@
     container_path: "{{ nginx_configuration_folder }}/nginx.conf"
 
 - name: Copy certificates
-  copy:
+  ansible.builtin.copy:
     src: ../files/cert/
     dest: /tmp/cert/
 
@@ -28,3 +28,25 @@
     - key.pem
     - cert.pem
   notify: Reload Nginx
+
+- name: Copy fail2ban config
+  ansible.builtin.copy:
+    src: ../files/fail2ban
+    dest: /tmp
+
+- name: Copy fail2ban filter into container
+  community.docker.docker_container_copy_into:
+    container: fail2ban
+    path: "/tmp/fail2ban/nginx-4xx-filter.conf"
+    container_path: "etc/fail2ban/filter.d/nginx-4xx.conf"
+
+- name: Copy fail2ban jail into container
+  community.docker.docker_container_copy_into:
+    container: fail2ban
+    path: "/tmp/fail2ban/nginx-4xx-jail.conf"
+    container_path: "etc/fail2ban/jail.d/nginx-4xx.conf"
+
+- name: Reload fail2ban
+  community.docker.docker_container_exec:
+    container: fail2ban
+    command: fail2ban-client reload

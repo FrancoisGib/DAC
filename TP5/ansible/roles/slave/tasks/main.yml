@@ -1,32 +1,46 @@
 - name: Include gather facts from shared role
-  include_role:
+  ansible.builtin.include_role:
     name: shared
     tasks_from: gather_facts
 
 - name: stop postgres
-  service: 
+  ansible.builtin.service: 
     name: postgresql 
     state: stopped
 
-- name: remove data directory
-  shell: rm -rf /var/lib/postgresql/16/main/*
-  become: yes
+- name: Pause for 10 seconds
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: Remove data directory contents
+  ansible.builtin.file:
+    path: /var/lib/postgresql/16/main/
+    state: absent
+    force: true
+
+- name: Recreate the main directory
+  ansible.builtin.file:
+    path: /var/lib/postgresql/16/main/
+    state: directory
+    owner: postgres
+    mode: '0750'
+
+# - name: remove data directory
+#   ansible.builtin.shell: rm -rf /var/lib/postgresql/16/main/*
 
 - name: backup
-  command: "pg_basebackup -h {{ master_ip }} -D /var/lib/postgresql/16/main -U replicator -P -v -R -X stream -S {{ inventory_hostname }}_slot"
-  become: yes
+  ansible.builtin.command: "pg_basebackup -h {{ master_ip }} -D /var/lib/postgresql/16/main -U replicator -P -v -R -X stream -S {{ inventory_hostname }}_slot"
   become_user: postgres
   environment:
     PGPASSWORD: replicator
 
 - name: Copy configuration file into instance
-  template:
+  ansible.builtin.template:
     src: slave_postgresql.conf.j2
     dest: /etc/postgresql/16/main/postgresql.conf
-  become: yes
   become_user: postgres
 
 - name: start postgres
-  service: 
+  ansible.builtin.service: 
     name: postgresql
     state: started

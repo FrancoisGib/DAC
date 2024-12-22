@@ -14,3 +14,23 @@
       - '--path.rootfs=/host'
     volumes:
       - '/:/host:ro,rslave'
+
+- name: Pull the cadvisor
+  docker_image:
+    name: gcr.io/cadvisor/cadvisor
+    source: pull
+
+- name: Create cadvisor container
+  docker_container:
+    name: cadvisor
+    image: gcr.io/cadvisor/cadvisor
+    ports:
+      - "8085:8080"
+    restart_policy: unless-stopped
+    privileged: true
+    pid_mode:
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro

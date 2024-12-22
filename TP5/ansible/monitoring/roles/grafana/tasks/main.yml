@@ -25,7 +25,7 @@
   delay: 5
   until: grafana_status.status == 200
 
-- name: Create System Metrics datasource
+- name: Create prometheus datasource
   grafana_datasource:
     name: Prometheus
     ds_type: prometheus
@@ -37,7 +37,7 @@
 
 - name: Copy systems dashboard
   copy:
-    src: systems_dashboard2.json
+    src: systems_dashboard.json
     dest: /tmp/systems_dashboard.json
 
 - name: Import dashboard for System metrics
@@ -90,3 +90,31 @@
     state: present
     overwrite: true
     path: /tmp/pgpool_dashboard.json
+
+- name: Copy fail2ban dashboard
+  copy:
+    src: fail2ban_dashboard.json
+    dest: /tmp/fail2ban_dashboard.json
+
+- name: Import fail2ban dashboard
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/fail2ban_dashboard.json
+
+- name: Copy cadvisor dashboard
+  copy:
+    src: cadvisor_dashboard.json
+    dest: /tmp/cadvisor_dashboard.json
+
+- name: Import cadvisor dashboard
+  grafana_dashboard:
+    grafana_url: "http://localhost:3000"
+    url_username: "admin"
+    url_password: "password"
+    state: present
+    overwrite: true
+    path: /tmp/cadvisor_dashboard.json

@@ -15,6 +15,7 @@ FILES = lib \
 		  parsing \
 		  logger \
 		  db \
+		  linpack \
 		  http
 
 FILES_SSL = ssl \
@@ -32,6 +33,8 @@ OBJECTS_DIR_NO_SSL = $(addprefix $(BUILD_DIR)/, $(OBJECTS_NO_SSL))
 SSL = -DUSE_SSL
 MAIN_OUTPUT = http
 LOGGING = -DLOGGING=0
+
+all: http
 
 dir:
 	mkdir -p $(BUILD_DIR)

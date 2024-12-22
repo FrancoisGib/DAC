@@ -6,6 +6,6 @@ cluster_name = '16/main'
 unix_socket_directories = '/var/run/postgresql'
 
 hot_standby = on
-primary_conninfo = 'host={{ master_ip }} port=5432 user=replicator password=replicator'
+primary_conninfo = 'host={{ master_ip }} port={{ postgres_port }} user=replicator password=replicator'
 primary_slot_name = '{{ inventory_hostname }}_slot'
 listen_addresses = '*'

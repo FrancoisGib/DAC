@@ -1,0 +1,31 @@
+table ip proxy_table {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        ip saddr 172.28.0.0/16 accept
+        tcp dport 22 accept
+        tcp sport { 53 } accept
+        udp sport 53 accept
+        iifname "lo" accept
+        iifname "docker0" accept # For cadvisor and access docker containers on docker subnet
+        jump nginx_input
+        drop
+    }
+    
+    chain nginx_input {
+        tcp dport 443 accept
+        tcp dport 80 accept
+        jump pgpool_input
+    }
+
+    chain pgpool_input {
+        tcp dport 5432 accept
+        tcp sport 5432 accept
+        jump monitoring_input
+    }
+
+    chain monitoring_input {
+        tcp dport { 3000, 9090 } accept
+        udp dport 3000 accept
+        udp dport 9090 accept
+    }
+}

@@ -32,7 +32,7 @@
       {
          "type": "datasource",
          "id": "prometheus",
-         "name": "Systems Metrics",
+         "name": "Prometheus",
          "version": "1.0.0"
       },
       {

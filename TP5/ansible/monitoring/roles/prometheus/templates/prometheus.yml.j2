@@ -1,3 +1,6 @@
+global:
+  scrape_interval: 30s
+
 scrape_configs:
   - job_name: Systems metrics
     static_configs:
@@ -26,3 +29,17 @@ scrape_configs:
       - targets: ['{{ proxy_ip }}:9113']
         labels:
           alias: Nginx
+
+  - job_name: fail2ban
+    static_configs:
+      - targets: ['{{ proxy_ip }}:9191']
+        labels:
+          alias: fail2ban
+  
+  - job_name: cadvisor
+    static_configs:
+    {% for host in groups['proxy'] + groups['webservers'] %}
+    - targets: ['{{ hostvars[host]['ansible_host'] }}:8085']
+          labels:
+            alias: {{ hostvars[host]['inventory_hostname'] }}
+    {% endfor %}

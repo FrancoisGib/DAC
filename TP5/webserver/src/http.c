@@ -332,7 +332,9 @@ void construct_response(int client_socket, http_req_res_t *http_req_res)
       {
          printf("Success sending content\n");
       }
-      free(http_response->resource.content);
+      if (http_response->content_length > 0) {
+         free(http_response->resource.content);
+      }
       break;
 
    default:

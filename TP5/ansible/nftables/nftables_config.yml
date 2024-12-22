@@ -1,0 +1,35 @@
+- name: nftables proxy configuration
+  hosts: proxy
+  tasks:
+    - name: Check if the proxy table exists
+      ansible.builtin.command: nft list table proxy_table
+      register: proxy_table_check
+      failed_when: false
+
+    - name: Copy nftables proxy configuration
+      ansible.builtin.template:
+        src: files/proxy.conf.j2
+        dest: /tmp/proxy.conf
+      when: proxy_table_check.stdout == ""
+
+    - name: Apply nftables proxy configuration
+      ansible.builtin.command: nft -f /tmp/proxy.conf
+      when: proxy_table_check.stdout == ""
+
+- name: nftables servers configuration
+  hosts: webservers
+  tasks:
+    - name: Check if the server table exists
+      ansible.builtin.command: nft list table server_table
+      register: server_table_check
+      failed_when: false
+
+    - name: Copy nftables server configuration
+      ansible.builtin.template:
+        src: files/servers.conf.j2
+        dest: /tmp/servers.conf
+      when: server_table_check.stdout == ""
+
+    - name: Apply nftables server configuration
+      ansible.builtin.command: nft -f /tmp/servers.conf
+      when: server_table_check.stdout == ""

@@ -346,7 +346,7 @@
           "refId": "B"
         }
       ],
-      "title": "Active Connectios",
+      "title": "Active Connections",
       "type": "timeseries"
     },
     {

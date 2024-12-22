@@ -1,6 +1,6 @@
 ---
 - name: Gather facts (just required configuration facts)
-  setup:
+  ansible.builtin.setup:
     filter: "{{ required_facts }}"
   when: 
     - "required_facts is defined"

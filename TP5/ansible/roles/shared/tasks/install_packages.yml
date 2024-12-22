@@ -1,10 +1,10 @@
 ---
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
 
 - name: Install required apt packages
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     update_cache: true
   retries: 3
@@ -14,7 +14,7 @@
     - "required_packages.apt | length > 0"
 
 - name: Install required pkg packages
-  apt:
+  ansible.builtin.apt:
     pkg: "{{ required_packages.pkg }}"
   retries: 3
   when:
@@ -22,7 +22,7 @@
     - "required_packages.pkg | length > 0"
 
 - name: Install required pip packages
-  pip:
+  ansible.builtin.pip:
     name: "{{ item }}"
   retries: 3
   with_items: "{{ required_packages.pip }}"

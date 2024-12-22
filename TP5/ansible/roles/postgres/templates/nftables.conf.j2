@@ -1,8 +1,0 @@
-# Postgres nftables config
-table ip postgres_table {
-    chain input {
-        type filter hook input priority 1; policy accept;
-        ip saddr {{ proxy_ip }} tcp dport 5432 accept
-        drop
-    }
-}

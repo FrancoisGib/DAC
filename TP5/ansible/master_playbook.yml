@@ -25,3 +25,4 @@
     - pgpool
 
 - import_playbook: monitoring/playbook.yml
+- import_playbook: nftables/nftables_config.yml

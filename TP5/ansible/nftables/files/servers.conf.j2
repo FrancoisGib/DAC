@@ -1,0 +1,11 @@
+table ip server_table {
+    chain input {
+        type filter hook input priority 0; policy accept;
+        ip saddr {{ proxy_ip }} accept
+        tcp dport 22 accept
+        tcp sport { 53 } accept
+        udp sport 53 accept
+        iifname "lo" accept
+        drop
+    }
+}

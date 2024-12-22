@@ -1,0 +1,3 @@
+---
+postgres_port: "{{ postgres_default_port | default(5432) | string }}"
+...

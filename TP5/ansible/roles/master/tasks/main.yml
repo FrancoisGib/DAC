@@ -1,20 +1,20 @@
 - name: Include gather facts from shared role
-  include_role:
+  ansible.builtin.include_role:
     name: shared
     tasks_from: gather_facts
 
-- name: Copy configuration file into instance
-  copy:
-    src: master_postgresql.conf
+- name: Copy template configuration file into instance
+  ansible.builtin.template:
+    src: master_postgresql.conf.j2
     dest: /etc/postgresql/16/main/postgresql.conf
 
 - name: restart postgres
-  service: 
+  ansible.builtin.service: 
     name: postgresql 
     state: restarted
 
 - name: Create replicator user
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: replicator
     password: replicator
     role_attr_flags: REPLICATION
@@ -22,7 +22,7 @@
   become_user: postgres
 
 - name: Create replication slots
-  postgresql_query:
+  community.postgresql.postgresql_query:
     query: "SELECT pg_create_physical_replication_slot('{{ item }}_slot') 
         WHERE NOT EXISTS (
           SELECT 1 FROM pg_replication_slots 
@@ -33,7 +33,7 @@
   with_items: "{{ groups['slaves'] }}"
 
 - name: Create test_table
-  postgresql_table:
+  community.postgresql.postgresql_table:
     db: postgres
     name: test_table
     columns:
@@ -45,7 +45,7 @@
   become_user: postgres
 
 - name: Insert query to test_table into postgres db
-  postgresql_query:
+  community.postgresql.postgresql_query:
     query: INSERT INTO test_table (id, username, password) VALUES (1, 'username', 'password');
   become: yes
   become_user: postgres

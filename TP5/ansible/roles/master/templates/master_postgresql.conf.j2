@@ -1,0 +1,17 @@
+# Default
+data_directory = '/var/lib/postgresql/16/main'
+hba_file = '/etc/postgresql/16/main/pg_hba.conf'
+ident_file = '/etc/postgresql/16/main/pg_ident.conf'
+external_pid_file = '/var/run/postgresql/16-main.pid'
+cluster_name = '16/main'
+unix_socket_directories = '/var/run/postgresql'
+
+max_wal_senders = 10
+wal_keep_size = 1024
+
+
+listen_addresses = '*'
+port = {{ postgres_port }}
+
+wal_level = replica
+max_replication_slots = {{ groups['slaves'] | length }}
