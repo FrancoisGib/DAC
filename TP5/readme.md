@@ -318,7 +318,7 @@ Pour voir toutes les informations de monitoring avec grafana, il faut aller sur 
 
 Attention, pour le dashboard **Systems metrics**, seules les instances proxy, et les webservers ne sont affichés sur le dashboard, les noms sont dupliqués (je n'ai pas réussi à modifier le dashboard pour changer ça).
 
-## Amélioration possibles
+## Améliorations possibles
 
 - Creation d'un Node Exporter pour le serveur HTTPS.
 - Elastic search avec Kibana pour utiliser une autre solution que Grafana et Prometheus.
